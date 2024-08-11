@@ -28,6 +28,42 @@ class _LevelRoadmapScreenState extends State<LevelRoadmapScreen> {
     prefs.setInt('lastLevel', level);
   }
 
+  void resetProgress() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('lastLevel', 1);
+    setState(() {
+      lastLevel = 1;
+    });
+  }
+
+  Future<void> _showResetConfirmationDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // User must tap button to dismiss dialog
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirm Reset'),
+          content: Text('Are you sure you want to reset progress and start from Level 1?'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Reset'),
+              onPressed: () {
+                resetProgress();
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -80,6 +116,11 @@ class _LevelRoadmapScreenState extends State<LevelRoadmapScreen> {
             );
           },
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _showResetConfirmationDialog,
+        child: Icon(Icons.refresh),
+        backgroundColor: Colors.red.shade400,
       ),
     );
   }
